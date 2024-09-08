@@ -1,9 +1,14 @@
 package controllers
 
-import "github.com/gin-gonic/gin"
+import (
+	"r_keeper/configs"
 
-func RunRouts() error {
+	"github.com/gin-gonic/gin"
+)
+
+func RunRouts() *gin.Engine {
 	r := gin.Default()
+	gin.SetMode(configs.AppSettings.AppParams.GinMode)
 
 	auth := r.Group("/auth")
 	{
@@ -20,5 +25,23 @@ func RunRouts() error {
 		userG.DELETE("/:id", DeleteUserByID)
 	}
 
-	return nil
+	orderG := r.Group("/orders", checkUserAuthentication)
+	{
+		orderG.GET("", GetAllOrders)
+		orderG.GET("/:id", GetOrderByID)
+		orderG.POST("", CreateOrder)
+		orderG.PUT("/:id", EditOrderByID)
+		orderG.DELETE("/:id", DeleteOrderByID)
+	}
+
+	// dishG := r.Group("/dishes")
+	// {
+	// 	dishG.GET("", GetALlDishes)
+	// 	dishG.GET("/:id", GetDishByID)
+	// 	dishG.POST("", CreateDish)
+	// 	dishG.PUT("/:id", EditDishByID)
+	// 	dishG.DELETE("/:id", DeleteDishByID)
+	// }
+
+	return r
 }

@@ -18,7 +18,7 @@ func RegisterUser(db *gorm.DB, username, password, role string) error {
 	user := models.User{
 		Username: username,
 		Password: string(hashedPassword),
-		Role:     role,
+		// Role:     role,
 	}
 
 	if err := db.Create(&user).Error; err != nil {

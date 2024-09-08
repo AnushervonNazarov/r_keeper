@@ -50,7 +50,7 @@ func EditUserByID(id uint, userInput models.User) (*models.User, error) {
 		return nil, fmt.Errorf("user not found: %v", err)
 	}
 
-	userInput.ID = int(id)
+	userInput.ID = id
 
 	updatedUser, err := repository.EditUserByID(&userInput)
 	if err != nil {

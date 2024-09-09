@@ -15,4 +15,4 @@
 1. Склонируйте репозиторий:
 
    ```bash
-   git clone https://github.com/yourusername/r_keeper.git
+   git clone https://github.com/AnushervonNazarov/r_keeper

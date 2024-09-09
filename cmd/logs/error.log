@@ -72,3 +72,5 @@
 2024/09/08 13:05:47.258595 [controllers.GetOrderByID] error getting order record not found
 2024/09/08 13:07:02.723992 [repository.GetOrderByID] error getting order by id: record not found
 2024/09/08 13:07:02.724069 [controllers.EditOrderByID] error editing order: order not found: record not found
+2024/09/09 10:54:16.838922 [repository.GetUserByUsername] error getting user by username: record not found
+2024/09/09 10:54:59.019146 [repository.GetOrderByID] error getting order by id: record not found

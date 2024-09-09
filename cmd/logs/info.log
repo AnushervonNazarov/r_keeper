@@ -353,3 +353,37 @@
 [GIN] 2024/09/08 - 13:07:25 | 200 |    2.707218ms |             ::1 | GET      "/orders/4"
 [GIN] 2024/09/08 - 13:07:39 | 200 |   16.617995ms |             ::1 | PUT      "/orders/4"
 [GIN] 2024/09/08 - 13:07:42 | 200 |       2.544ms |             ::1 | GET      "/orders/4"
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN] 2024/09/09 - 10:52:02 | 401 |      90.166µs |             ::1 | GET      "/orders"
+[GIN] 2024/09/09 - 10:52:07 | 200 |    2.057198ms |             ::1 | POST     "/auth/sign-in"
+[GIN] 2024/09/09 - 10:52:37 | 200 |    2.364542ms |             ::1 | GET      "/orders"
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN] 2024/09/09 - 10:54:16 | 201 |   12.108862ms |             ::1 | POST     "/auth/sign-up"
+[GIN] 2024/09/09 - 10:54:19 | 200 |    1.726406ms |             ::1 | POST     "/auth/sign-in"
+[GIN] 2024/09/09 - 10:54:59 | 201 |   13.182154ms |             ::1 | POST     "/orders"
+[GIN] 2024/09/09 - 10:55:02 | 200 |    2.378517ms |             ::1 | GET      "/orders"
+[GIN] 2024/09/09 - 11:01:21 | 401 |      64.839µs |             ::1 | DELETE   "/orders/1"
+[GIN] 2024/09/09 - 11:01:54 | 200 |   10.173537ms |             ::1 | DELETE   "/orders/1"
+[GIN] 2024/09/09 - 11:01:58 | 200 |    1.112004ms |             ::1 | GET      "/orders"
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+

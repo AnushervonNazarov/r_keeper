@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"r_keeper/configs"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -23,7 +24,7 @@ func GenerateToken(userID uint, username string) (string, error) {
 		UserID:   userID,
 		Username: username,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * 1).Unix(), // токен истекает через 1 час
+			ExpiresAt: time.Now().Add(time.Minute * time.Duration(configs.AppSettings.AuthParams.JwtTtlMinutes)).Unix(),
 			Issuer:    "your_app_name",
 		},
 	}

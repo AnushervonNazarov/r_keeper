@@ -17,6 +17,17 @@ type User struct {
 	Password  string `json:"password" gorm:"not null"`
 	RoleID    uint   `json:"role_id" gorm:"not null"`
 	Role      Role   `json:"role" gorm:"foreignKey:RoleID;references:ID"`
+	IsDeleted bool   `json:"is_deleted" gorm:"default:false"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
+}
+
+type SwagUser struct {
+	Username string `json:"username" gorm:"unique"`
+	Password string `json:"password" gorm:"not null"`
+}
+
+type SignInInput struct {
+	Username string `json:"username" gorm:"unique"`
+	Password string `json:"password" gorm:"not null"`
 }

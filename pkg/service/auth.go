@@ -1,6 +1,8 @@
 package service
 
 import (
+	"errors"
+	"r_keeper/errs"
 	"r_keeper/models"
 	"r_keeper/pkg/repository"
 	"r_keeper/utils"
@@ -31,10 +33,13 @@ func SignIn(username, password string) (accessToken string, err error) {
 	password = utils.GenerateHash(password)
 	user, err := repository.GetUserByUsernameAndPassword(username, password)
 	if err != nil {
+		if errors.Is(err, errs.ErrRecordNotFound) {
+			return "", errs.ErrIncorrectUsernameOrPassword
+		}
 		return "", err
 	}
 
-	accessToken, err = GenerateToken(uint(user.ID), user.Username)
+	accessToken, err = GenerateToken(user.ID, user.Username)
 	if err != nil {
 		return "", err
 	}

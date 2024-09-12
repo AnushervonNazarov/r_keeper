@@ -1,14 +1,21 @@
 package controllers
 
 import (
+	"net/http"
 	"r_keeper/configs"
+	_ "r_keeper/docs"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func RunRouts() *gin.Engine {
 	r := gin.Default()
 	gin.SetMode(configs.AppSettings.AppParams.GinMode)
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.GET("/ping", PingPong)
 
 	auth := r.Group("/auth")
 	{
@@ -16,7 +23,9 @@ func RunRouts() *gin.Engine {
 		auth.POST("/sign-in", SignIn)
 	}
 
-	userG := r.Group("/users", checkUserAuthentication)
+	apiG := r.Group("/api", checkUserAuthentication)
+
+	userG := apiG.Group("/users")
 	{
 		userG.GET("", GetAllUsers)
 		userG.GET("/:id", GetUserByID)
@@ -25,7 +34,7 @@ func RunRouts() *gin.Engine {
 		userG.DELETE("/:id", DeleteUserByID)
 	}
 
-	orderG := r.Group("/orders", checkUserAuthentication)
+	orderG := apiG.Group("/orders")
 	{
 		orderG.GET("", GetAllOrders)
 		orderG.GET("/:id", GetOrderByID)
@@ -44,4 +53,10 @@ func RunRouts() *gin.Engine {
 	// }
 
 	return r
+}
+
+func PingPong(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"message": "pong",
+	})
 }

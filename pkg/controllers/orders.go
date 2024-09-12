@@ -10,6 +10,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetAllOrders
+// @Summary Get All Orders
+// @Security ApiKeyAuth
+// @Tags orders
+// @Description get list of orders
+// @ID get-all-orders
+// @Produce json
+// @Param q query string false "fill if you need search"
+// @Success 200 {array} models.Order
+// @Failure 400 404 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Failure default {object} ErrorResponse
+// @Router /api/orders [get]
 func GetAllOrders(c *gin.Context) {
 	orders, err := service.GetAllOrders()
 	if err != nil {
@@ -25,6 +38,19 @@ func GetAllOrders(c *gin.Context) {
 	})
 }
 
+// GetOrderByID
+// @Summary Get Order By ID
+// @Security ApiKeyAuth
+// @Tags orders
+// @Description get order by ID
+// @ID get-order-by-id
+// @Produce json
+// @Param id path integer true "id of the order"
+// @Success 200 {object} models.Order
+// @Failure 400 404 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Failure default {object} ErrorResponse
+// @Router /api/orders/{id} [get]
 func GetOrderByID(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -47,6 +73,20 @@ func GetOrderByID(c *gin.Context) {
 	c.JSON(http.StatusOK, order)
 }
 
+// CreateOrder
+// @Summary Create Order
+// @Security ApiKeyAuth
+// @Tags orders
+// @Description create new order
+// @ID create-order
+// @Accept json
+// @Produce json
+// @Param input body models.Order true "new order info"
+// @Success 200 {object} defaultResponse
+// @Failure 400 404 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Failure default {object} ErrorResponse
+// @Router /api/orders [post]
 func CreateOrder(c *gin.Context) {
 	var order models.Order
 	if err := c.BindJSON(&order); err != nil {
@@ -73,6 +113,21 @@ func CreateOrder(c *gin.Context) {
 	})
 }
 
+// EditOrderByID
+// @Summary Edit Order
+// @Security ApiKeyAuth
+// @Tags orders
+// @Description edit existed order
+// @ID edit-order
+// @Accept json
+// @Produce json
+// @Param id path integer true "id of the order"
+// @Param input body models.Order true "order update info"
+// @Success 200 {object} defaultResponse
+// @Failure 400 404 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Failure default {object} ErrorResponse
+// @Router /api/orders/{id} [put]
 func EditOrderByID(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -104,6 +159,18 @@ func EditOrderByID(c *gin.Context) {
 	c.JSON(http.StatusOK, updatedOrder)
 }
 
+// DeleteOrder
+// @Summary Delete Order By ID
+// @Security ApiKeyAuth
+// @Tags orders
+// @Description delete order by ID
+// @ID delete-order-by-id
+// @Param id path integer true "id of the order"
+// @Success 200 {object} defaultResponse
+// @Failure 400 404 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Failure default {object} ErrorResponse
+// @Router /api/orders/{id} [delete]
 func DeleteOrderByID(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

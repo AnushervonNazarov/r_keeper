@@ -2,18 +2,18 @@ package service
 
 import (
 	"fmt"
+	"os"
 	"r_keeper/configs"
+	"r_keeper/logger"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 )
 
-// Секретный ключ для подписания токенов
-var secretKey = []byte("your_secret_key")
-
 // CustomClaims определяет кастомные поля токена
 type CustomClaims struct {
 	UserID   uint   `json:"user_id"`
+	Role     string `json:"role"`
 	Username string `json:"username"`
 	jwt.StandardClaims
 }
@@ -30,7 +30,7 @@ func GenerateToken(userID uint, username string) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(secretKey)
+	return token.SignedString([]byte(os.Getenv("JWT_SECRET_KEY")))
 }
 
 // ParseToken парсит JWT токен и возвращает кастомные поля
@@ -40,16 +40,17 @@ func ParseToken(tokenString string) (*CustomClaims, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return secretKey, nil
+		return []byte(os.Getenv("JWT_SECRET_KEY")), nil
 	})
 
 	if err != nil {
+		logger.Error.Println("[service.ParseToken] cannot parse token. Error is:", err.Error())
 		return nil, err
 	}
 
 	if claims, ok := token.Claims.(*CustomClaims); ok && token.Valid {
 		return claims, nil
 	}
-
+	logger.Error.Println("[service.ParseToken] invalid token")
 	return nil, fmt.Errorf("invalid token")
 }

@@ -1,5 +1,5 @@
 {
-    "auth": {
+    "auth_params": {
       "jwt_secret_key": "kjkklmn",
       "jwt_ttl_minutes": 60
     },
@@ -7,7 +7,7 @@
       "log_directory": "logs",
       "log_info": "info.log",
       "log_error": "error.log",
-      "log_warn": "warning.log",
+      "log_warn": "warn.log",
       "log_debug": "debug.log",
       "max_size_megabytes": 10,
       "max_backups": 5,
@@ -25,6 +25,6 @@
       "host": "localhost",
       "port": "5433",
       "user": "postgres",
-      "database": "r_keeper"
+      "database": "postgres"
     }
   }

@@ -12,14 +12,15 @@ import (
 // }
 
 type User struct {
-	ID        uint   `json:"id" gorm:"primaryKey"`
-	Username  string `json:"username" gorm:"unique;not null"`
-	Password  string `json:"password" gorm:"not null"`
-	RoleID    uint   `json:"role_id" gorm:"not null"`
-	Role      Role   `json:"role" gorm:"foreignKey:RoleID;references:ID"`
-	IsDeleted bool   `json:"is_deleted" gorm:"default:false"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID       uint   `json:"id" gorm:"primaryKey"`
+	Username string `json:"username" gorm:"unique;not null"`
+	Password string `json:"password" gorm:"not null"`
+	// Role      Role      `json:"-" gorm:"foreignKey:RoleID;references:ID"`
+	// RoleID    uint      `json:"-" gorm:"not null"`
+	Role      string    `json:"role" gorm:"not null"`
+	IsDeleted bool      `json:"is_deleated" gorm:"default:false"`
+	CreatedAt time.Time `json:"created_at" gorm:"autocreatedtime"`
+	UpdatedAt time.Time `json:"updated_at" gorm:"autoupdatedtime"`
 }
 
 type SwagUser struct {

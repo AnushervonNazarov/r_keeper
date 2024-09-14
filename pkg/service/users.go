@@ -3,11 +3,10 @@ package service
 import (
 	"errors"
 	"fmt"
+	"r_keeper/errs"
 	"r_keeper/models"
 	"r_keeper/pkg/repository"
 	"r_keeper/utils"
-
-	"gorm.io/gorm"
 )
 
 func GetAllUsers() (users []models.User, err error) {
@@ -30,7 +29,7 @@ func GetUserByID(id uint) (user models.User, err error) {
 
 func CreateUser(user models.User) error {
 	_, err := repository.GetUserByUsername(user.Username)
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+	if err != nil && !errors.Is(err, errs.ErrRecordNotFound) {
 		return err
 	}
 

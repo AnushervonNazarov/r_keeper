@@ -18,3 +18,9 @@ type Menu struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
+
+type SwagMenu struct {
+	Name     string  `json:"name" gorm:"not null"`
+	Price    float64 `json:"price" gorm:"not null"`
+	Category string  `json:"category" gorm:"not null"`
+}

@@ -6,6 +6,13 @@ VALUES (3, 'Menu Item 1', 50.00, 'Category 1', NOW(), NOW()),
 
 INSERT INTO tables (id, table_number, capacity, created_at, updated_at) VALUES (1, 10, 4, NOW(), NOW());
 
+INSERT INTO roles (id, name) VALUES (1, 'admin');
+INSERT INTO roles (id, name) VALUES (2, 'waiter');
+
+INSERT INTO users (username, password, role_id)
+VALUES ('saybrhon', 'q123', 1);  -- 1 should be an existing role_id
+
+
 DELETE FROM order_items WHERE order_id = 1;
 ON DELETE CASCADE
 
@@ -25,3 +32,8 @@ ALTER TABLE order_items
 ADD CONSTRAINT fk_orders_items
 FOREIGN KEY (order_id) REFERENCES orders(id)
 ON DELETE CASCADE;
+
+
+SELECT * FROM roles WHERE id = 2;
+
+ALTER TABLE users ALTER COLUMN role_id DROP NOT NULL;

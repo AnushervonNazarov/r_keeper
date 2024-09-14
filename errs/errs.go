@@ -6,7 +6,7 @@ var (
 	ErrPermissionDenied            = errors.New("ErrPermissionDenied")
 	ErrValidationFailed            = errors.New("ErrValidationFailed")
 	ErrUsernameUniquenessFailed    = errors.New("ErrUsernameUniquenessFailed")
-	ErrOperationNotFound           = errors.New("ErrOperationNotFound")
+	ErrOrderNotFound               = errors.New("ErrOrderNotFound")
 	ErrIncorrectUsernameOrPassword = errors.New("ErrIncorrectUsernameOrPassword")
 	ErrRecordNotFound              = errors.New("ErrRecordNotFound")
 	ErrUserNotFound                = errors.New("ErrUserNotFound")

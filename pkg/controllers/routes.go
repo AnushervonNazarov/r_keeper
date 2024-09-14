@@ -43,6 +43,24 @@ func RunRouts() *gin.Engine {
 		orderG.DELETE("/:id", DeleteOrderByID)
 	}
 
+	menuG := apiG.Group("/menus")
+	{
+		menuG.GET("", GetAllMenus)
+		menuG.GET("/:id", GetMenuByID)
+		menuG.POST("", CreateMenu)
+		menuG.PUT("/:id", EditMenuByID)
+		menuG.DELETE("/:id", DeleteMenuByID)
+	}
+
+	tableG := apiG.Group("/tables")
+	{
+		tableG.GET("", GetAllTables)
+		tableG.GET("/:id", GetTableByID)
+		tableG.POST("", CreateTable)
+		tableG.PUT("/:id", EditTableByID)
+		tableG.DELETE("/:id", DeleteTableByID)
+	}
+
 	// dishG := r.Group("/dishes")
 	// {
 	// 	dishG.GET("", GetALlDishes)

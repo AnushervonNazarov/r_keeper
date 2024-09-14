@@ -8,22 +8,22 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type ErrorResponse struct {
-	Error string `json:"error"`
-}
+// type ErrorResponse struct {
+// 	Error string `json:"error"`
+// }
 
-func newErrorResponse(message string) ErrorResponse {
-	return ErrorResponse{
-		Error: message,
-	}
-}
+// func newErrorResponse(message string) ErrorResponse {
+// 	return ErrorResponse{
+// 		Error: message,
+// 	}
+// }
 
 func handleError(c *gin.Context, err error) {
 	if errors.Is(err, errs.ErrUsernameUniquenessFailed) ||
 		errors.Is(err, errs.ErrIncorrectUsernameOrPassword) {
 		c.JSON(http.StatusBadRequest, newErrorResponse(err.Error()))
 	} else if errors.Is(err, errs.ErrRecordNotFound) ||
-		errors.Is(err, errs.ErrOperationNotFound) {
+		errors.Is(err, errs.ErrOrderNotFound) {
 		c.JSON(http.StatusNotFound, newErrorResponse(err.Error()))
 	} else if errors.Is(err, errs.ErrPermissionDenied) {
 		c.JSON(http.StatusForbidden, newErrorResponse(err.Error()))
@@ -32,16 +32,16 @@ func handleError(c *gin.Context, err error) {
 	}
 }
 
-type defaultResponse struct {
-	Message string `json:"message"`
-}
+// type defaultResponse struct {
+// 	Message string `json:"message"`
+// }
 
-func newDefaultResponse(message string) defaultResponse {
-	return defaultResponse{
-		Message: message,
-	}
-}
+// func newDefaultResponse(message string) defaultResponse {
+// 	return defaultResponse{
+// 		Message: message,
+// 	}
+// }
 
-type accessTokenResponse struct {
-	AccessToken string `json:"access_token"`
-}
+// type accessTokenResponse struct {
+// 	AccessToken string `json:"access_token"`
+// }

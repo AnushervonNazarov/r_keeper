@@ -78,27 +78,32 @@ definitions:
       updatedAt:
         type: string
     type: object
-  models.Role:
-    properties:
-      createdAt:
-        type: string
-      id:
-        type: integer
-      name:
-        type: string
-      updatedAt:
-        type: string
-      users:
-        items:
-          $ref: '#/definitions/models.User'
-        type: array
-    type: object
   models.SignInInput:
     properties:
       password:
         type: string
       username:
         type: string
+    type: object
+  models.SwagMenu:
+    properties:
+      category:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+    type: object
+  models.SwagTable:
+    properties:
+      capacity:
+        type: integer
+      id:
+        type: integer
+      reserved:
+        type: boolean
+      table_number:
+        type: integer
     type: object
   models.SwagUser:
     properties:
@@ -119,6 +124,8 @@ definitions:
         items:
           $ref: '#/definitions/models.Order'
         type: array
+      reserved:
+        type: boolean
       table_number:
         type: integer
       updatedAt:
@@ -126,19 +133,20 @@ definitions:
     type: object
   models.User:
     properties:
-      createdAt:
+      created_at:
         type: string
       id:
         type: integer
-      is_deleted:
+      is_deleated:
         type: boolean
       password:
         type: string
       role:
-        $ref: '#/definitions/models.Role'
-      role_id:
-        type: integer
-      updatedAt:
+        description: |-
+          Role      Role      `json:"-" gorm:"foreignKey:RoleID;references:ID"`
+          RoleID    uint      `json:"-" gorm:"not null"`
+        type: string
+      updated_at:
         type: string
       username:
         type: string
@@ -150,6 +158,183 @@ info:
   title: R_KEEPER API
   version: "1.0"
 paths:
+  /api/menus:
+    get:
+      description: get list of menus
+      operationId: get-all-menus
+      parameters:
+      - description: fill if you need search
+        in: query
+        name: q
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Menu'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: "404"
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Menus
+      tags:
+      - menus
+    post:
+      consumes:
+      - application/json
+      description: create new menu
+      operationId: create-menu
+      parameters:
+      - description: new menu info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.SwagMenu'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.defaultResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: "404"
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Menu
+      tags:
+      - menus
+  /api/menus/{id}:
+    delete:
+      description: delete menu by ID
+      operationId: delete-menu-by-id
+      parameters:
+      - description: id of the menu
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.defaultResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: "404"
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Menu By ID
+      tags:
+      - menus
+    get:
+      description: get menu by ID
+      operationId: get-menu-by-id
+      parameters:
+      - description: id of the order
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Menu'
+        "400":
+          description: Bad Request
+          schema:
+            type: "404"
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Menu By ID
+      tags:
+      - menus
+    put:
+      consumes:
+      - application/json
+      description: edit existed menu
+      operationId: edit-menu
+      parameters:
+      - description: id of the order
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: menu update info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.Menu'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.defaultResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: "404"
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Edit Menu
+      tags:
+      - menus
   /api/orders:
     get:
       description: get list of orders
@@ -327,6 +512,183 @@ paths:
       summary: Edit Order
       tags:
       - orders
+  /api/tables:
+    get:
+      description: get list of tables
+      operationId: get-all-tables
+      parameters:
+      - description: fill if you need search
+        in: query
+        name: q
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.SwagTable'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: "404"
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Tables
+      tags:
+      - tables
+    post:
+      consumes:
+      - application/json
+      description: create new table
+      operationId: create-table
+      parameters:
+      - description: new table info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.SwagTable'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.defaultResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: "404"
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Table
+      tags:
+      - tables
+  /api/tables/{id}:
+    delete:
+      description: delete table by ID
+      operationId: delete-table-by-id
+      parameters:
+      - description: id of the table
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.defaultResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: "404"
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Table By ID
+      tags:
+      - tables
+    get:
+      description: get table by ID
+      operationId: get-table-by-id
+      parameters:
+      - description: id of the table
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SwagTable'
+        "400":
+          description: Bad Request
+          schema:
+            type: "404"
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Table By ID
+      tags:
+      - tables
+    put:
+      consumes:
+      - application/json
+      description: edit existed table
+      operationId: edit-table
+      parameters:
+      - description: id of the table
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: table update info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.Table'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.defaultResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: "404"
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Edit Table
+      tags:
+      - tables
   /auth/sign-in:
     post:
       consumes:
@@ -397,4 +759,9 @@ paths:
       summary: SignUp
       tags:
       - auth
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

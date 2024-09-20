@@ -3,14 +3,13 @@ package service
 import (
 	"errors"
 	"fmt"
+	"r_keeper/errs"
 	"r_keeper/models"
 	"r_keeper/pkg/repository"
-
-	"gorm.io/gorm"
 )
 
-func GetAllOrders() (orders []models.Order, err error) {
-	if orders, err = repository.GetAllOrders(); err != nil {
+func GetAllOrders(userID uint, query string) (orders []models.Order, err error) {
+	if orders, err = repository.GetAllOrders(userID, query); err != nil {
 		return nil, err
 	}
 	return orders, nil
@@ -25,7 +24,7 @@ func GetOrderByID(id int) (order models.Order, err error) {
 
 func CreateOrder(order models.Order) error {
 	_, err := repository.GetOrderByID(int(order.ID))
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+	if err != nil && !errors.Is(err, errs.ErrRecordNotFound) {
 		return err
 	}
 

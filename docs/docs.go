@@ -320,7 +320,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Order"
+                                "$ref": "#/definitions/models.SwagOrder"
                             }
                         }
                     },
@@ -369,7 +369,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Order"
+                            "$ref": "#/definitions/models.SwagOrder"
                         }
                     }
                 ],
@@ -430,7 +430,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Order"
+                            "$ref": "#/definitions/models.SwagOrder"
                         }
                     },
                     "400": {
@@ -1085,11 +1085,28 @@ const docTemplate = `{
                 "category": {
                     "type": "string"
                 },
+                "id": {
+                    "type": "integer"
+                },
                 "name": {
                     "type": "string"
                 },
                 "price": {
                     "type": "number"
+                }
+            }
+        },
+        "models.SwagOrder": {
+            "type": "object",
+            "properties": {
+                "qunatity": {
+                    "type": "integer"
+                },
+                "table": {
+                    "type": "integer"
+                },
+                "user": {
+                    "type": "integer"
                 }
             }
         },

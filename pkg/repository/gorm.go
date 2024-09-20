@@ -3,12 +3,10 @@ package repository
 import (
 	"errors"
 	"r_keeper/errs"
-
-	"gorm.io/gorm"
 )
 
 func translateError(err error) error {
-	if errors.Is(err, gorm.ErrRecordNotFound) {
+	if errors.Is(err, errs.ErrRecordNotFound) {
 		return errs.ErrRecordNotFound
 	}
 

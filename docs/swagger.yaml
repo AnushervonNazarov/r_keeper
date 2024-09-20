@@ -89,10 +89,21 @@ definitions:
     properties:
       category:
         type: string
+      id:
+        type: integer
       name:
         type: string
       price:
         type: number
+    type: object
+  models.SwagOrder:
+    properties:
+      qunatity:
+        type: integer
+      table:
+        type: integer
+      user:
+        type: integer
     type: object
   models.SwagTable:
     properties:
@@ -351,7 +362,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.Order'
+              $ref: '#/definitions/models.SwagOrder'
             type: array
         "400":
           description: Bad Request
@@ -381,7 +392,7 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/models.Order'
+          $ref: '#/definitions/models.SwagOrder'
       produces:
       - application/json
       responses:
@@ -453,7 +464,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Order'
+            $ref: '#/definitions/models.SwagOrder'
         "400":
           description: Bad Request
           schema:

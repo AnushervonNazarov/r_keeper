@@ -6,8 +6,17 @@ import (
 	"r_keeper/models"
 )
 
-func GetAllOrders() (orders []models.Order, err error) {
-	if err = db.GetDBConn().Preload("Items").Find(&orders).Error; err != nil {
+func GetAllOrders(userID uint, query string) ([]models.Order, error) {
+	var orders []models.Order
+
+	query = "%" + query + "%"
+
+	if err := db.GetDBConn().Model(&models.Order{}).
+		Joins("JOIN users ON users.id = orders.user_id").
+		Preload("Items").
+		Where("orders.user_id = ? AND description iLIKE ?", userID, query).
+		Order("orders.id").
+		Find(&orders).Error; err != nil {
 		logger.Error.Println("[repository.GetAllOrders] error getting all orders:", err.Error())
 		return nil, translateError(err)
 	}

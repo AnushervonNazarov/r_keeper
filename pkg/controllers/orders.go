@@ -18,13 +18,21 @@ import (
 // @ID get-all-orders
 // @Produce json
 // @Param q query string false "fill if you need search"
-// @Success 200 {array} models.Order
+// @Success 200 {array} models.SwagOrder
 // @Failure 400 404 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Failure default {object} ErrorResponse
 // @Router /api/orders [get]
 func GetAllOrders(c *gin.Context) {
-	orders, err := service.GetAllOrders()
+	query := c.Query("q")
+
+	userID := c.GetUint(userIDCtx)
+	if userID == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	orders, err := service.GetAllOrders(userID, query)
 	if err != nil {
 		logger.Error.Printf("[controllers.GetAllOrders] error getting all orders: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -46,7 +54,7 @@ func GetAllOrders(c *gin.Context) {
 // @ID get-order-by-id
 // @Produce json
 // @Param id path integer true "id of the order"
-// @Success 200 {object} models.Order
+// @Success 200 {object} models.SwagOrder
 // @Failure 400 404 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Failure default {object} ErrorResponse
@@ -81,7 +89,7 @@ func GetOrderByID(c *gin.Context) {
 // @ID create-order
 // @Accept json
 // @Produce json
-// @Param input body models.Order true "new order info"
+// @Param input body models.SwagOrder true "new order info"
 // @Success 200 {object} defaultResponse
 // @Failure 400 404 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse

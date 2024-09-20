@@ -54,3 +54,9 @@ type Inventory struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
+
+type SwagOrder struct {
+	Table    uint `json:"table" gorm:"foreignKey:TableID;references:ID;constraint:OnDelete:CASCADE;"`
+	User     uint `json:"user" gorm:"foreignKey:UserID;references:ID;constraint:OnDelete:CASCADE;"`
+	Quantity int  `json:"qunatity" gorm:"not null"`
+}

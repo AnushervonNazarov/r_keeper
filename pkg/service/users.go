@@ -21,6 +21,9 @@ func GetAllUsers() (users []models.User, err error) {
 func GetUserByID(id uint) (user models.User, err error) {
 	user, err = repository.GetUserByID(id)
 	if err != nil {
+		if errors.Is(err, errs.ErrRecordNotFound) {
+			return user, errs.ErrUserNotFound
+		}
 		return user, err
 	}
 
@@ -28,10 +31,16 @@ func GetUserByID(id uint) (user models.User, err error) {
 }
 
 func CreateUser(user models.User) error {
-	_, err := repository.GetUserByUsername(user.Username)
+	userFromDB, err := repository.GetUserByUsername(user.Username)
 	if err != nil && !errors.Is(err, errs.ErrRecordNotFound) {
 		return err
 	}
+
+	if userFromDB.ID > 0 {
+		return errs.ErrUsernameUniquenessFailed
+	}
+
+	user.Role = "user"
 
 	user.Password = utils.GenerateHash(user.Password)
 

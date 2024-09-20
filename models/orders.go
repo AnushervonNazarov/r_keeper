@@ -56,7 +56,7 @@ type Inventory struct {
 }
 
 type SwagOrder struct {
-	Table    uint `json:"table" gorm:"foreignKey:TableID;references:ID;constraint:OnDelete:CASCADE;"`
-	User     uint `json:"user" gorm:"foreignKey:UserID;references:ID;constraint:OnDelete:CASCADE;"`
-	Quantity int  `json:"qunatity" gorm:"not null"`
+	Table    SwagTable `json:"table" gorm:"foreignKey:TableID;references:ID;constraint:OnDelete:CASCADE;"`
+	User     SwagUser  `json:"user" gorm:"foreignKey:UserID;references:ID;constraint:OnDelete:CASCADE;"`
+	Quantity int       `json:"qunatity" gorm:"not null"`
 }

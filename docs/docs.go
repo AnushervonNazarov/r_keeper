@@ -1103,10 +1103,10 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "table": {
-                    "type": "integer"
+                    "$ref": "#/definitions/models.SwagTable"
                 },
                 "user": {
-                    "type": "integer"
+                    "$ref": "#/definitions/models.SwagUser"
                 }
             }
         },

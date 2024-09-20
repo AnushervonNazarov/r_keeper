@@ -24,14 +24,7 @@ import (
 // @Failure default {object} ErrorResponse
 // @Router /api/orders [get]
 func GetAllOrders(c *gin.Context) {
-
-	userID := c.GetUint(userIDCtx)
-	if userID == 0 {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
-		return
-	}
-
-	orders, err := service.GetAllOrders(userID)
+	orders, err := service.GetAllOrders()
 	if err != nil {
 		logger.Error.Printf("[controllers.GetAllOrders] error getting all orders: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{

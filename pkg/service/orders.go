@@ -8,8 +8,8 @@ import (
 	"r_keeper/pkg/repository"
 )
 
-func GetAllOrders(userID uint) (orders []models.Order, err error) {
-	if orders, err = repository.GetAllOrders(userID); err != nil {
+func GetAllOrders() (orders []models.Order, err error) {
+	if orders, err = repository.GetAllOrders(); err != nil {
 		return nil, err
 	}
 	return orders, nil

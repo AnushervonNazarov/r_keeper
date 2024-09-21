@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"r_keeper/errs"
 	"r_keeper/logger"
 	"r_keeper/models"
 	"r_keeper/pkg/service"
@@ -24,6 +25,12 @@ import (
 // @Failure default {object} ErrorResponse
 // @Router /api/orders [get]
 func GetAllOrders(c *gin.Context) {
+	userRole := c.GetString(userRoleCtx)
+	if userRole != "admin" {
+		handleError(c, errs.ErrPermissionDenied)
+		return
+	}
+
 	orders, err := service.GetAllOrders()
 	if err != nil {
 		logger.Error.Printf("[controllers.GetAllOrders] error getting all orders: %v\n", err)

@@ -8,8 +8,7 @@ func Migrate() error {
 	err := dbConn.AutoMigrate(
 		models.User{},
 		models.Order{},
-		models.OrderItem{},
-		models.Dishes{})
+		models.OrderItem{})
 	if err != nil {
 		return err
 	}

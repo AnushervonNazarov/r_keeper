@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func RegisterUser(db *gorm.DB, username, password, role string) error {
+func RegisterUser(db *gorm.DB, username, password string) error {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
@@ -39,7 +39,7 @@ func SignIn(username, password string) (accessToken string, err error) {
 		return "", err
 	}
 
-	accessToken, err = GenerateToken(user.ID, user.Username)
+	accessToken, err = GenerateToken(user.ID, user.Username, user.Role)
 	if err != nil {
 		return "", err
 	}

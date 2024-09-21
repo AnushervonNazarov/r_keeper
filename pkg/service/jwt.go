@@ -19,13 +19,14 @@ type CustomClaims struct {
 }
 
 // GenerateToken генерирует JWT токен с кастомными полями
-func GenerateToken(userID uint, username string) (string, error) {
+func GenerateToken(userID uint, username, role string) (string, error) {
 	claims := CustomClaims{
 		UserID:   userID,
 		Username: username,
+		Role:     role,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Minute * time.Duration(configs.AppSettings.AuthParams.JwtTtlMinutes)).Unix(),
-			Issuer:    "your_app_name",
+			Issuer:    configs.AppSettings.AppParams.ServerName,
 		},
 	}
 

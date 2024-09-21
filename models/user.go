@@ -13,7 +13,7 @@ import (
 
 type User struct {
 	ID       uint   `json:"id" gorm:"primaryKey"`
-	Username string `json:"username" gorm:"unique;not null"`
+	Username string `json:"username" gorm:"unique"`
 	Password string `json:"password" gorm:"not null"`
 	// Role      Role      `json:"-" gorm:"foreignKey:RoleID;references:ID"`
 	// RoleID    uint      `json:"-" gorm:"not null"`

@@ -31,6 +31,7 @@ func GetUserByID(id uint) (user models.User, err error) {
 }
 
 func CreateUser(user models.User) error {
+	// 1. Check username uniqueness
 	userFromDB, err := repository.GetUserByUsername(user.Username)
 	if err != nil && !errors.Is(err, errs.ErrRecordNotFound) {
 		return err
@@ -40,10 +41,12 @@ func CreateUser(user models.User) error {
 		return errs.ErrUsernameUniquenessFailed
 	}
 
-	user.Role = "user"
+	user.Role = "waiter"
 
+	// 2. Generate password hash
 	user.Password = utils.GenerateHash(user.Password)
 
+	// 3. Repository call
 	err = repository.CreateUser(user)
 	if err != nil {
 		return err

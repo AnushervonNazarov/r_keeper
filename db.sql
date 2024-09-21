@@ -6,7 +6,7 @@ VALUES (3, 'Menu Item 1', 50.00, 'Category 1', NOW(), NOW()),
 
 INSERT INTO tables (id, table_number, capacity, created_at, updated_at) VALUES (1, 10, 4, NOW(), NOW());
 
-INSERT INTO roles (id, name) VALUES (1, 'admin');
+INSERT INTO roles (id, name) VALUES (1, 'adm    in');
 INSERT INTO roles (id, name) VALUES (2, 'waiter');
 
 INSERT INTO users (username, password, role_id)

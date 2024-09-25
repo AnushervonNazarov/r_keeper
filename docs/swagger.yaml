@@ -15,67 +15,40 @@ definitions:
       message:
         type: string
     type: object
-  models.Menu:
+  models.Check:
     properties:
-      category:
-        type: string
-      createdAt:
+      datetime:
         type: string
       id:
         type: integer
       items:
         items:
-          $ref: '#/definitions/models.OrderItem'
+          $ref: '#/definitions/models.CheckItem'
         type: array
+      order_id:
+        type: integer
+      table_number:
+        type: integer
+      tax:
+        type: number
+      total_amount:
+        type: number
+    type: object
+  models.CheckItem:
+    properties:
+      check_id:
+        type: integer
+      created_at:
+        type: string
+      id:
+        type: integer
       name:
         type: string
       price:
         type: number
-      updatedAt:
-        type: string
-    type: object
-  models.Order:
-    properties:
-      createdAt:
-        type: string
-      id:
+      quantity:
         type: integer
-      items:
-        items:
-          $ref: '#/definitions/models.OrderItem'
-        type: array
-      table:
-        $ref: '#/definitions/models.Table'
-      table_id:
-        type: integer
-      total_amount:
-        type: number
-      updatedAt:
-        type: string
-      user:
-        $ref: '#/definitions/models.User'
-      user_id:
-        type: integer
-    type: object
-  models.OrderItem:
-    properties:
-      createdAt:
-        type: string
-      id:
-        type: integer
-      menu_item:
-        $ref: '#/definitions/models.Menu'
-      menu_item_id:
-        type: integer
-      order:
-        $ref: '#/definitions/models.Order'
-      order_id:
-        type: integer
-      price:
-        type: number
-      qunatity:
-        type: integer
-      updatedAt:
+      updated_at:
         type: string
     type: object
   models.SignInInput:
@@ -98,6 +71,8 @@ definitions:
     type: object
   models.SwagOrder:
     properties:
+      price:
+        type: number
       qunatity:
         type: integer
       table:
@@ -123,45 +98,6 @@ definitions:
       username:
         type: string
     type: object
-  models.Table:
-    properties:
-      capacity:
-        type: integer
-      createdAt:
-        type: string
-      id:
-        type: integer
-      orders:
-        items:
-          $ref: '#/definitions/models.Order'
-        type: array
-      reserved:
-        type: boolean
-      table_number:
-        type: integer
-      updatedAt:
-        type: string
-    type: object
-  models.User:
-    properties:
-      created_at:
-        type: string
-      id:
-        type: integer
-      is_deleated:
-        type: boolean
-      password:
-        type: string
-      role:
-        description: |-
-          Role      Role      `json:"-" gorm:"foreignKey:RoleID;references:ID"`
-          RoleID    uint      `json:"-" gorm:"not null"`
-        type: string
-      updated_at:
-        type: string
-      username:
-        type: string
-    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -169,6 +105,43 @@ info:
   title: R_KEEPER API
   version: "1.0"
 paths:
+  /api/checks:
+    post:
+      consumes:
+      - application/json
+      description: create new check
+      operationId: create-check
+      parameters:
+      - description: new check info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.Check'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.defaultResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: "404"
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Check
+      tags:
+      - checks
   /api/menus:
     get:
       description: get list of menus
@@ -185,7 +158,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.Menu'
+              $ref: '#/definitions/models.SwagMenu'
             type: array
         "400":
           description: Bad Request
@@ -287,7 +260,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Menu'
+            $ref: '#/definitions/models.SwagMenu'
         "400":
           description: Bad Request
           schema:
@@ -321,7 +294,7 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/models.Menu'
+          $ref: '#/definitions/models.SwagMenu'
       produces:
       - application/json
       responses:
@@ -498,7 +471,7 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/models.Order'
+          $ref: '#/definitions/models.SwagOrder'
       produces:
       - application/json
       responses:
@@ -675,7 +648,7 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/models.Table'
+          $ref: '#/definitions/models.SwagTable'
       produces:
       - application/json
       responses:

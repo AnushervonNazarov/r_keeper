@@ -59,6 +59,12 @@ func GetAllOrders(c *gin.Context) {
 // @Failure default {object} ErrorResponse
 // @Router /api/orders/{id} [get]
 func GetOrderByID(c *gin.Context) {
+	userRole := c.GetString(userRoleCtx)
+	if userRole != "admin" {
+		handleError(c, errs.ErrPermissionDenied)
+		return
+	}
+
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		logger.Error.Printf("[controllers.GetOrderByID] error getting order %v\n", err)
@@ -75,6 +81,7 @@ func GetOrderByID(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
+		return
 	}
 
 	c.JSON(http.StatusOK, order)
@@ -129,13 +136,19 @@ func CreateOrder(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path integer true "id of the order"
-// @Param input body models.Order true "order update info"
+// @Param input body models.SwagOrder true "order update info"
 // @Success 200 {object} defaultResponse
 // @Failure 400 404 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Failure default {object} ErrorResponse
 // @Router /api/orders/{id} [put]
 func EditOrderByID(c *gin.Context) {
+	userRole := c.GetString(userRoleCtx)
+	if userRole != "admin" {
+		handleError(c, errs.ErrPermissionDenied)
+		return
+	}
+
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		logger.Error.Printf("[controllers.EditOrderByID] error editing order: %v\n", err)
@@ -179,6 +192,12 @@ func EditOrderByID(c *gin.Context) {
 // @Failure default {object} ErrorResponse
 // @Router /api/orders/{id} [delete]
 func DeleteOrderByID(c *gin.Context) {
+	userRole := c.GetString(userRoleCtx)
+	if userRole != "admin" {
+		handleError(c, errs.ErrPermissionDenied)
+		return
+	}
+
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		logger.Error.Printf("[controllers.DeleteOrderByID] error deleating order: %v\n", err)
@@ -200,4 +219,77 @@ func DeleteOrderByID(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "order deleted successfully",
 	})
+}
+
+// CreateCheck
+// @Summary Create Check
+// @Security ApiKeyAuth
+// @Tags checks
+// @Description create new check
+// @ID create-check
+// @Accept json
+// @Produce json
+// @Param input body models.Check true "new check info"
+// @Success 200 {object} defaultResponse
+// @Failure 400 404 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Failure default {object} ErrorResponse
+// @Router /api/checks [post]
+func CreateCheck(c *gin.Context) {
+	var items []models.CheckItem
+	if err := c.BindJSON(&items); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	orderID, _ := strconv.Atoi(c.Param("order_id"))
+	tableNumber, _ := strconv.Atoi(c.Param("table_number"))
+
+	// Вызываем сервис для создания чека
+	check, err := service.CreateCheck(orderID, tableNumber, items)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Возвращаем результат
+	c.JSON(http.StatusOK, gin.H{"check": check})
+}
+
+func GetAllChecks(c *gin.Context) {
+	checks, err := service.GetAllChecks()
+	if err != nil {
+		logger.Error.Printf("[controllers.GetAllChecks] error getting all checks: %v\n", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"checks": checks,
+	})
+}
+
+func GetCheckByID(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		logger.Error.Printf("[controllers.GetCheckByID] error getting check %v\n", err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid id",
+		})
+
+		return
+	}
+
+	check, err := service.GetCheckByID(id)
+	if err != nil {
+		logger.Error.Printf("[controllers.GetCheckByID] error getting check %v\n", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, check)
 }

@@ -15,6 +15,64 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/checks": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "create new check",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "checks"
+                ],
+                "summary": "Create Check",
+                "operationId": "create-check",
+                "parameters": [
+                    {
+                        "description": "new check info",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Check"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.defaultResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "404"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/menus": {
             "get": {
                 "security": [
@@ -45,7 +103,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Menu"
+                                "$ref": "#/definitions/models.SwagMenu"
                             }
                         }
                     },
@@ -155,7 +213,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Menu"
+                            "$ref": "#/definitions/models.SwagMenu"
                         }
                     },
                     "400": {
@@ -210,7 +268,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Menu"
+                            "$ref": "#/definitions/models.SwagMenu"
                         }
                     }
                 ],
@@ -485,7 +543,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Order"
+                            "$ref": "#/definitions/models.SwagOrder"
                         }
                     }
                 ],
@@ -760,7 +818,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Table"
+                            "$ref": "#/definitions/models.SwagTable"
                         }
                     }
                 ],
@@ -972,13 +1030,10 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Menu": {
+        "models.Check": {
             "type": "object",
             "properties": {
-                "category": {
-                    "type": "string"
-                },
-                "createdAt": {
+                "datetime": {
                     "type": "string"
                 },
                 "id": {
@@ -987,8 +1042,34 @@ const docTemplate = `{
                 "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.OrderItem"
+                        "$ref": "#/definitions/models.CheckItem"
                     }
+                },
+                "order_id": {
+                    "type": "integer"
+                },
+                "table_number": {
+                    "type": "integer"
+                },
+                "tax": {
+                    "type": "number"
+                },
+                "total_amount": {
+                    "type": "number"
+                }
+            }
+        },
+        "models.CheckItem": {
+            "type": "object",
+            "properties": {
+                "check_id": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
                 },
                 "name": {
                     "type": "string"
@@ -996,74 +1077,10 @@ const docTemplate = `{
                 "price": {
                     "type": "number"
                 },
-                "updatedAt": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.Order": {
-            "type": "object",
-            "properties": {
-                "createdAt": {
-                    "type": "string"
-                },
-                "id": {
+                "quantity": {
                     "type": "integer"
                 },
-                "items": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.OrderItem"
-                    }
-                },
-                "table": {
-                    "$ref": "#/definitions/models.Table"
-                },
-                "table_id": {
-                    "type": "integer"
-                },
-                "total_amount": {
-                    "type": "number"
-                },
-                "updatedAt": {
-                    "type": "string"
-                },
-                "user": {
-                    "$ref": "#/definitions/models.User"
-                },
-                "user_id": {
-                    "type": "integer"
-                }
-            }
-        },
-        "models.OrderItem": {
-            "type": "object",
-            "properties": {
-                "createdAt": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "menu_item": {
-                    "$ref": "#/definitions/models.Menu"
-                },
-                "menu_item_id": {
-                    "type": "integer"
-                },
-                "order": {
-                    "$ref": "#/definitions/models.Order"
-                },
-                "order_id": {
-                    "type": "integer"
-                },
-                "price": {
-                    "type": "number"
-                },
-                "qunatity": {
-                    "type": "integer"
-                },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -1099,6 +1116,9 @@ const docTemplate = `{
         "models.SwagOrder": {
             "type": "object",
             "properties": {
+                "price": {
+                    "type": "number"
+                },
                 "qunatity": {
                     "type": "integer"
                 },
@@ -1131,62 +1151,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "password": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.Table": {
-            "type": "object",
-            "properties": {
-                "capacity": {
-                    "type": "integer"
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "orders": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Order"
-                    }
-                },
-                "reserved": {
-                    "type": "boolean"
-                },
-                "table_number": {
-                    "type": "integer"
-                },
-                "updatedAt": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.User": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "is_deleated": {
-                    "type": "boolean"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "role": {
-                    "description": "Role      Role      ` + "`" + `json:\"-\" gorm:\"foreignKey:RoleID;references:ID\"` + "`" + `\nRoleID    uint      ` + "`" + `json:\"-\" gorm:\"not null\"` + "`" + `",
-                    "type": "string"
-                },
-                "updated_at": {
                     "type": "string"
                 },
                 "username": {

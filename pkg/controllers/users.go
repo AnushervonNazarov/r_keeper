@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"r_keeper/errs"
 	"r_keeper/logger"
 	"r_keeper/models"
 	"r_keeper/pkg/service"
@@ -11,6 +12,12 @@ import (
 )
 
 func GetAllUsers(c *gin.Context) {
+	userRole := c.GetString(userRoleCtx)
+	if userRole != "admin" {
+		handleError(c, errs.ErrPermissionDenied)
+		return
+	}
+
 	users, err := service.GetAllUsers()
 	if err != nil {
 		logger.Error.Printf("[controllers.GetAllUsers] error getting all user: %v\n", err)
@@ -26,6 +33,12 @@ func GetAllUsers(c *gin.Context) {
 }
 
 func GetUserByID(c *gin.Context) {
+	userRole := c.GetString(userRoleCtx)
+	if userRole != "admin" {
+		handleError(c, errs.ErrPermissionDenied)
+		return
+	}
+
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		logger.Error.Printf("[controllers.GetUserByID] error getting user: %v\n", err)
@@ -42,6 +55,7 @@ func GetUserByID(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
+		return
 	}
 
 	c.JSON(http.StatusOK, user)
@@ -49,6 +63,12 @@ func GetUserByID(c *gin.Context) {
 }
 
 func CreateUser(c *gin.Context) {
+	userRole := c.GetString(userRoleCtx)
+	if userRole != "admin" {
+		handleError(c, errs.ErrPermissionDenied)
+		return
+	}
+
 	var user models.User
 	if err := c.BindJSON(&user); err != nil {
 		logger.Error.Printf("[controllers.CreateUser] error creating user: %v\n", err)
@@ -76,6 +96,12 @@ func CreateUser(c *gin.Context) {
 }
 
 func EditUserByID(c *gin.Context) {
+	userRole := c.GetString(userRoleCtx)
+	if userRole != "admin" {
+		handleError(c, errs.ErrPermissionDenied)
+		return
+	}
+
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		logger.Error.Printf("[controllers.EditUserByID] error editing user: %v\n", err)
@@ -107,6 +133,12 @@ func EditUserByID(c *gin.Context) {
 }
 
 func DeleteUserByID(c *gin.Context) {
+	userRole := c.GetString(userRoleCtx)
+	if userRole != "admin" {
+		handleError(c, errs.ErrPermissionDenied)
+		return
+	}
+
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		logger.Error.Printf("[controllers.DeleteUserByID] error deleating user: %v\n", err)

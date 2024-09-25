@@ -34,6 +34,12 @@ func RunRouts() *gin.Engine {
 		userG.DELETE("/:id", DeleteUserByID)
 	}
 
+	checkG := apiG.Group("/checks")
+	{
+		checkG.GET("/:id", GetCheckByID)
+		checkG.POST("/:order_id/:table_number", CreateCheck)
+	}
+
 	orderG := apiG.Group("/orders")
 	{
 		orderG.GET("", GetAllOrders)

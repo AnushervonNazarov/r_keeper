@@ -6,7 +6,7 @@ VALUES (3, 'Menu Item 1', 50.00, 'Category 1', NOW(), NOW()),
 
 INSERT INTO tables (id, table_number, capacity, created_at, updated_at) VALUES (1, 10, 4, NOW(), NOW());
 
-INSERT INTO roles (id, name) VALUES (1, 'adm    in');
+INSERT INTO roles (id, name) VALUES (1, 'admin');
 INSERT INTO roles (id, name) VALUES (2, 'waiter');
 
 INSERT INTO users (username, password, role_id)
@@ -38,4 +38,15 @@ SELECT * FROM roles WHERE id = 2;
 
 ALTER TABLE users ALTER COLUMN role_id DROP NOT NULL;
 
-SELECT * FROM users
+SELECT * FROM checks
+
+INSERT INTO orders (table_id, total_amount) 
+VALUES (1, 100.00); -- Ошибка, если нет записи с id = 1 в таблице tables
+
+SELECT * FROM orders;
+
+INSERT INTO tables (id, name) VALUES (1, 'Table 1');
+
+SELECT * FROM tables
+
+SELECT * FROM tables WHERE id = 1;

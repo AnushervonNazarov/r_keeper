@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"r_keeper/errs"
 	"r_keeper/logger"
 	"r_keeper/models"
 	"r_keeper/pkg/service"
@@ -25,6 +26,12 @@ import (
 // @Failure default {object} ErrorResponse
 // @Router /api/menus [post]
 func CreateMenu(c *gin.Context) {
+	userRole := c.GetString(userRoleCtx)
+	if userRole != "admin" {
+		handleError(c, errs.ErrPermissionDenied)
+		return
+	}
+
 	var menu models.Menu
 	if err := c.BindJSON(&menu); err != nil {
 		logger.Error.Printf("[controllers.CreateMenu] error creating menu %v\n", err)
@@ -58,7 +65,7 @@ func CreateMenu(c *gin.Context) {
 // @ID get-all-menus
 // @Produce json
 // @Param q query string false "fill if you need search"
-// @Success 200 {array} models.Menu
+// @Success 200 {array} models.SwagMenu
 // @Failure 400 404 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Failure default {object} ErrorResponse
@@ -86,7 +93,7 @@ func GetAllMenus(c *gin.Context) {
 // @ID get-menu-by-id
 // @Produce json
 // @Param id path integer true "id of the order"
-// @Success 200 {object} models.Menu
+// @Success 200 {object} models.SwagMenu
 // @Failure 400 404 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Failure default {object} ErrorResponse
@@ -108,6 +115,7 @@ func GetMenuByID(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
+		return
 	}
 
 	c.JSON(http.StatusOK, menu)
@@ -122,13 +130,19 @@ func GetMenuByID(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path integer true "id of the order"
-// @Param input body models.Menu true "menu update info"
+// @Param input body models.SwagMenu true "menu update info"
 // @Success 200 {object} defaultResponse
 // @Failure 400 404 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Failure default {object} ErrorResponse
 // @Router /api/menus/{id} [put]
 func EditMenuByID(c *gin.Context) {
+	userRole := c.GetString(userRoleCtx)
+	if userRole != "admin" {
+		handleError(c, errs.ErrPermissionDenied)
+		return
+	}
+
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		logger.Error.Printf("[controllers.EditMenuByID] error editing menu: %v\n", err)
@@ -172,6 +186,12 @@ func EditMenuByID(c *gin.Context) {
 // @Failure default {object} ErrorResponse
 // @Router /api/menus/{id} [delete]
 func DeleteMenuByID(c *gin.Context) {
+	userRole := c.GetString(userRoleCtx)
+	if userRole != "admin" {
+		handleError(c, errs.ErrPermissionDenied)
+		return
+	}
+
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		logger.Error.Printf("[controllers.DeleteMenuByID] error deleating menu: %v\n", err)

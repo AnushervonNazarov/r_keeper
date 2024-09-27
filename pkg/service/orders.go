@@ -6,6 +6,7 @@ import (
 	"r_keeper/errs"
 	"r_keeper/models"
 	"r_keeper/pkg/repository"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -114,14 +115,14 @@ func GenerateReceipt(orderID int, commissionRate float64) (string, error) {
 
 	// Генерация чека
 	var receiptBuilder strings.Builder
-	receiptBuilder.WriteString(fmt.Sprintf("========== Чек ==========\n"))
-	receiptBuilder.WriteString(fmt.Sprintf("Номер заказа: %d\n", order.ID))
-	receiptBuilder.WriteString(fmt.Sprintf("Стол: %d\n", table.TableNumber))
-	receiptBuilder.WriteString(fmt.Sprintf("Дата: %s\n", time.Now().Format("02-01-2006 15:04")))
+	receiptBuilder.WriteString("========== Чек ==========\n")
+	receiptBuilder.WriteString("Номер заказа: " + strconv.Itoa(order.ID) + "\n")
+	receiptBuilder.WriteString("Стол: " + strconv.Itoa(table.TableNumber) + "\n")
+	receiptBuilder.WriteString("Дата: " + time.Now().Format("02-01-2006 15:04") + "\n")
 	receiptBuilder.WriteString("=========================\n")
 
-	receiptBuilder.WriteString(fmt.Sprintf("Наименование     Кол-во     Цена     Сумма\n"))
-	receiptBuilder.WriteString(fmt.Sprintf("-------------------------------------------\n"))
+	receiptBuilder.WriteString("Наименование     Кол-во     Цена     Сумма\n")
+	receiptBuilder.WriteString("-------------------------------------------\n")
 	var total float64
 	for _, item := range order.Items {
 		itemTotal := float64(item.Quantity) * item.Price
@@ -132,7 +133,7 @@ func GenerateReceipt(orderID int, commissionRate float64) (string, error) {
 	commission := total * commissionRate
 	netTotal := total + commission
 
-	receiptBuilder.WriteString(fmt.Sprintf("-------------------------------------------\n"))
+	receiptBuilder.WriteString("-------------------------------------------\n")
 	receiptBuilder.WriteString(fmt.Sprintf("Комиссия (%.0f%%): %25.2f\n", commissionRate*100, commission))
 	receiptBuilder.WriteString(fmt.Sprintf("Итог :             %23.2f\n", netTotal))
 	receiptBuilder.WriteString("=========================\n")

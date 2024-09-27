@@ -401,6 +401,61 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/orders/user/:id": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get list of orders",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Get User Orders",
+                "operationId": "get-user-orders",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "fill if you need search",
+                        "name": "q",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.SwagOrder"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "404"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/orders/{id}": {
             "get": {
                 "security": [
@@ -984,13 +1039,6 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "items": {
-                    "description": "Связь один ко многим с OrderItem",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.OrderItem"
-                    }
-                },
                 "name": {
                     "type": "string"
                 },
@@ -999,54 +1047,6 @@ const docTemplate = `{
                 },
                 "updated_at": {
                     "type": "string"
-                }
-            }
-        },
-        "models.Order": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "items": {
-                    "description": "Связь один ко многим с OrderItem",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.OrderItem"
-                    }
-                },
-                "table": {
-                    "description": "Связь с Table",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/models.Table"
-                        }
-                    ]
-                },
-                "table_id": {
-                    "description": "Внешний ключ на таблицу Table",
-                    "type": "integer"
-                },
-                "total_amount": {
-                    "type": "number"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "user": {
-                    "description": "Связь с User",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/models.User"
-                        }
-                    ]
-                },
-                "user_id": {
-                    "description": "Внешний ключ на таблицу User",
-                    "type": "integer"
                 }
             }
         },
@@ -1060,27 +1060,12 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "menu_item": {
-                    "description": "Связь с Menu",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/models.Menu"
-                        }
-                    ]
+                    "$ref": "#/definitions/models.Menu"
                 },
                 "menu_item_id": {
-                    "description": "Внешний ключ на таблицу Menu",
                     "type": "integer"
                 },
-                "order": {
-                    "description": "Связь с Order",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/models.Order"
-                        }
-                    ]
-                },
                 "order_id": {
-                    "description": "Внешний ключ на таблицу Order",
                     "type": "integer"
                 },
                 "price": {
@@ -1166,65 +1151,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "password": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.Table": {
-            "type": "object",
-            "properties": {
-                "capacity": {
-                    "type": "integer"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "orders": {
-                    "description": "Связь один ко многим с Order",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Order"
-                    }
-                },
-                "reserved": {
-                    "type": "boolean"
-                },
-                "table_number": {
-                    "type": "integer"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.User": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "description": "Автоматическая метка времени",
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "is_deleted": {
-                    "description": "Флаг удаления",
-                    "type": "boolean"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "role": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "description": "Автоматическая метка времени",
                     "type": "string"
                 },
                 "username": {

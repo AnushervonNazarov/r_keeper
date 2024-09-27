@@ -11,13 +11,42 @@ import (
 	"time"
 )
 
-func GetAllOrders() (orders []models.Order, err error) {
-	if orders, err = repository.GetAllOrders(); err != nil {
+func GetAllOrders() ([]models.OrderResponse, error) {
+	var orders []models.Order
+	err := repository.GetAllOrders(&orders) // Вызов репозитория для получения заказов
+	if err != nil {
 		return nil, err
 	}
-	return orders, nil
+
+	var orderResponses []models.OrderResponse
+	for _, order := range orders {
+		var orderResponse models.OrderResponse
+		orderResponse.ID = order.ID
+		orderResponse.TableID = order.TableID
+		orderResponse.UserID = order.UserID
+		orderResponse.TotalAmount = order.TotalAmount
+		orderResponse.CreatedAt = order.CreatedAt
+		orderResponse.UpdatedAt = order.UpdatedAt
+
+		for _, item := range order.Items {
+			orderResponse.Items = append(orderResponse.Items, models.OrderItemDTO{
+				ID:         item.ID,
+				MenuItemID: item.MenuItemID,
+				Quantity:   item.Quantity,
+				Price:      item.Price,
+				CreatedAt:  item.CreatedAt,
+				UpdatedAt:  item.UpdatedAt,
+			})
+		}
+		orderResponses = append(orderResponses, orderResponse)
+	}
+
+	return orderResponses, nil
 }
 
+func GetOrdersForUser(userID string) ([]models.Order, error) {
+	return repository.GetOrdersByUserID(userID)
+}
 func GetOrderByID(id int) (order models.Order, err error) {
 	if order, err = repository.GetOrderByID(id); err != nil {
 		return order, err

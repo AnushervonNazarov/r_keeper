@@ -42,6 +42,7 @@ func RunRouts() *gin.Engine {
 
 	orderG := apiG.Group("/orders")
 	{
+		orderG.GET("/user/:id", GetUserOrders)
 		orderG.GET("", GetAllOrders)
 		orderG.GET("/:id", GetOrderByID)
 		orderG.POST("", CreateOrder)

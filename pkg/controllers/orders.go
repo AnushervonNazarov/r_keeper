@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"r_keeper/db"
 	"r_keeper/errs"
@@ -26,37 +27,65 @@ import (
 // @Failure default {object} ErrorResponse
 // @Router /api/orders [get]
 func GetAllOrders(c *gin.Context) {
-	var orders []models.Order
+	userRole := c.GetString(userRoleCtx)
+	if userRole != "admin" {
+		handleError(c, errs.ErrPermissionDenied)
+		return
+	}
 
-	if err := db.GetDBConn().Preload("Items.MenuItem").Find(&orders).Error; err != nil {
+	orders, err := service.GetAllOrders()
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch orders"})
 		return
 	}
 
-	var orderResponses []models.OrderResponse
-	for _, order := range orders {
-		var orderResponse models.OrderResponse
-		orderResponse.ID = order.ID
-		orderResponse.TableID = order.TableID
-		orderResponse.UserID = order.UserID
-		orderResponse.TotalAmount = order.TotalAmount
-		orderResponse.CreatedAt = order.CreatedAt
-		orderResponse.UpdatedAt = order.UpdatedAt
+	c.JSON(http.StatusOK, gin.H{"orders": orders})
+}
 
-		for _, item := range order.Items {
-			orderResponse.Items = append(orderResponse.Items, models.OrderItemDTO{
-				ID:         item.ID,
-				MenuItemID: item.MenuItemID,
-				Quantity:   item.Quantity,
-				Price:      item.Price,
-				CreatedAt:  item.CreatedAt,
-				UpdatedAt:  item.UpdatedAt,
-			})
-		}
-		orderResponses = append(orderResponses, orderResponse)
+// GetUserOrders
+// @Summary Get User Orders
+// @Security ApiKeyAuth
+// @Tags orders
+// @Description get list of orders
+// @ID get-user-orders
+// @Produce json
+// @Param q query string false "fill if you need search"
+// @Success 200 {array} models.SwagOrder
+// @Failure 400 404 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Failure default {object} ErrorResponse
+// @Router /api/orders/user/:id [get]
+func GetUserOrders(c *gin.Context) {
+	requestedUserID := c.Param("id")
+
+	currentUserID, exists := c.Get(userIDCtx)
+	if !exists {
+		fmt.Println("userID not found in context")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"orders": orderResponses})
+	currentUserRole, roleExists := c.Get(userRoleCtx)
+	if !roleExists {
+		fmt.Println("userRole not found in context")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Role not found"})
+		return
+	}
+
+	currentUserIDStr := fmt.Sprintf("%v", currentUserID)
+
+	if currentUserRole != "admin" && requestedUserID != currentUserIDStr {
+		handleError(c, errs.ErrPermissionDenied)
+		return
+	}
+
+	orders, err := service.GetOrdersForUser(requestedUserID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Не удалось получить заказы"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"orders": orders})
 }
 
 // GetOrderByID

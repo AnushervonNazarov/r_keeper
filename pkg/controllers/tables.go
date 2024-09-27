@@ -71,12 +71,6 @@ func CreateTable(c *gin.Context) {
 // @Failure default {object} ErrorResponse
 // @Router /api/tables [get]
 func GetAllTables(c *gin.Context) {
-	userRole := c.GetString(userRoleCtx)
-	if userRole != "admin" {
-		handleError(c, errs.ErrPermissionDenied)
-		return
-	}
-
 	tables, err := service.GetAllTables()
 	if err != nil {
 		logger.Error.Printf("[controllers.GetAllTables] error getting all tables: %v\n", err)
@@ -105,12 +99,6 @@ func GetAllTables(c *gin.Context) {
 // @Failure default {object} ErrorResponse
 // @Router /api/tables/{id} [get]
 func GetTableByID(c *gin.Context) {
-	userRole := c.GetString(userRoleCtx)
-	if userRole != "admin" {
-		handleError(c, errs.ErrPermissionDenied)
-		return
-	}
-
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		logger.Error.Printf("[controllers.GetTableByID] error getting table %v\n", err)

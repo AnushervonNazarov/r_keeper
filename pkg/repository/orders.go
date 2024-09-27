@@ -7,10 +7,15 @@ import (
 	"r_keeper/models"
 )
 
-func GetAllOrders() (orders []models.Order, err error) {
-	if err = db.GetDBConn().Preload("Items").Find(&orders).Error; err != nil {
-		logger.Error.Println("[repository.GetAllOrders] error getting all orders:", err.Error())
-		return nil, translateError(err)
+func GetAllOrders(orders *[]models.Order) error {
+	return db.GetDBConn().Preload("Items.MenuItem").Find(orders).Error
+}
+
+func GetOrdersByUserID(userID string) ([]models.Order, error) {
+	var orders []models.Order
+	err := db.GetDBConn().Find(&orders, "user_id = ?", userID).Error
+	if err != nil {
+		return nil, err
 	}
 	return orders, nil
 }

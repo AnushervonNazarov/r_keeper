@@ -29,7 +29,7 @@ import "time"
 type Order struct {
 	ID          int         `json:"id" gorm:"primaryKey"`
 	TableID     int         `json:"table_id" gorm:"not null"`
-	UserID      int         `json:"user_id" gorm:"not null"`
+	UserID      string      `json:"user_id" gorm:"not null"`
 	TotalAmount float64     `json:"total_amount" gorm:"not null"`
 	Items       []OrderItem `json:"items" gorm:"foreignKey:OrderID;constraint:OnDelete:CASCADE;"`
 	CreatedAt   time.Time   `json:"created_at" gorm:"autoCreateTime"`
@@ -50,7 +50,7 @@ type OrderItem struct {
 type OrderResponse struct {
 	ID          int            `json:"id"`
 	TableID     int            `json:"table_id"`
-	UserID      int            `json:"user_id"`
+	UserID      string         `json:"user_id"`
 	TotalAmount float64        `json:"total_amount"`
 	Items       []OrderItemDTO `json:"items"`
 	CreatedAt   time.Time      `json:"created_at"`

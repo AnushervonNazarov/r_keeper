@@ -23,47 +23,12 @@ definitions:
         type: string
       id:
         type: integer
-      items:
-        description: Связь один ко многим с OrderItem
-        items:
-          $ref: '#/definitions/models.OrderItem'
-        type: array
       name:
         type: string
       price:
         type: number
       updated_at:
         type: string
-    type: object
-  models.Order:
-    properties:
-      created_at:
-        type: string
-      id:
-        type: integer
-      items:
-        description: Связь один ко многим с OrderItem
-        items:
-          $ref: '#/definitions/models.OrderItem'
-        type: array
-      table:
-        allOf:
-        - $ref: '#/definitions/models.Table'
-        description: Связь с Table
-      table_id:
-        description: Внешний ключ на таблицу Table
-        type: integer
-      total_amount:
-        type: number
-      updated_at:
-        type: string
-      user:
-        allOf:
-        - $ref: '#/definitions/models.User'
-        description: Связь с User
-      user_id:
-        description: Внешний ключ на таблицу User
-        type: integer
     type: object
   models.OrderItem:
     properties:
@@ -72,18 +37,10 @@ definitions:
       id:
         type: integer
       menu_item:
-        allOf:
-        - $ref: '#/definitions/models.Menu'
-        description: Связь с Menu
+        $ref: '#/definitions/models.Menu'
       menu_item_id:
-        description: Внешний ключ на таблицу Menu
         type: integer
-      order:
-        allOf:
-        - $ref: '#/definitions/models.Order'
-        description: Связь с Order
       order_id:
-        description: Внешний ключ на таблицу Order
         type: integer
       price:
         type: number
@@ -140,46 +97,6 @@ definitions:
   models.SwagUser:
     properties:
       password:
-        type: string
-      username:
-        type: string
-    type: object
-  models.Table:
-    properties:
-      capacity:
-        type: integer
-      created_at:
-        type: string
-      id:
-        type: integer
-      orders:
-        description: Связь один ко многим с Order
-        items:
-          $ref: '#/definitions/models.Order'
-        type: array
-      reserved:
-        type: boolean
-      table_number:
-        type: integer
-      updated_at:
-        type: string
-    type: object
-  models.User:
-    properties:
-      created_at:
-        description: Автоматическая метка времени
-        type: string
-      id:
-        type: integer
-      is_deleted:
-        description: Флаг удаления
-        type: boolean
-      password:
-        type: string
-      role:
-        type: string
-      updated_at:
-        description: Автоматическая метка времени
         type: string
       username:
         type: string
@@ -543,6 +460,41 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Edit Order
+      tags:
+      - orders
+  /api/orders/user/:id:
+    get:
+      description: get list of orders
+      operationId: get-user-orders
+      parameters:
+      - description: fill if you need search
+        in: query
+        name: q
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.SwagOrder'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: "404"
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get User Orders
       tags:
       - orders
   /api/tables:

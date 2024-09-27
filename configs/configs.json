@@ -1,6 +1,5 @@
 {
     "auth_params": {
-      "jwt_secret_key": "kjkklmn",
       "jwt_ttl_minutes": 60
     },
     "log_params": {

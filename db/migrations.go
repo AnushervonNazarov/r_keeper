@@ -6,11 +6,10 @@ import (
 
 func Migrate() error {
 	err := dbConn.AutoMigrate(
+		models.Table{},
 		models.User{},
 		models.Order{},
-		models.OrderItem{},
-		models.Check{},
-		models.CheckItem{})
+		models.OrderItem{})
 	if err != nil {
 		return err
 	}

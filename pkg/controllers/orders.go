@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"r_keeper/db"
 	"r_keeper/errs"
 	"r_keeper/logger"
 	"r_keeper/models"
@@ -25,24 +26,37 @@ import (
 // @Failure default {object} ErrorResponse
 // @Router /api/orders [get]
 func GetAllOrders(c *gin.Context) {
-	userRole := c.GetString(userRoleCtx)
-	if userRole != "admin" {
-		handleError(c, errs.ErrPermissionDenied)
+	var orders []models.Order
+
+	if err := db.GetDBConn().Preload("Items.MenuItem").Find(&orders).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch orders"})
 		return
 	}
 
-	orders, err := service.GetAllOrders()
-	if err != nil {
-		logger.Error.Printf("[controllers.GetAllOrders] error getting all orders: %v\n", err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-		return
+	var orderResponses []models.OrderResponse
+	for _, order := range orders {
+		var orderResponse models.OrderResponse
+		orderResponse.ID = order.ID
+		orderResponse.TableID = order.TableID
+		orderResponse.UserID = order.UserID
+		orderResponse.TotalAmount = order.TotalAmount
+		orderResponse.CreatedAt = order.CreatedAt
+		orderResponse.UpdatedAt = order.UpdatedAt
+
+		for _, item := range order.Items {
+			orderResponse.Items = append(orderResponse.Items, models.OrderItemDTO{
+				ID:         item.ID,
+				MenuItemID: item.MenuItemID,
+				Quantity:   item.Quantity,
+				Price:      item.Price,
+				CreatedAt:  item.CreatedAt,
+				UpdatedAt:  item.UpdatedAt,
+			})
+		}
+		orderResponses = append(orderResponses, orderResponse)
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"orders": orders,
-	})
+	c.JSON(http.StatusOK, gin.H{"orders": orderResponses})
 }
 
 // GetOrderByID
@@ -103,12 +117,24 @@ func GetOrderByID(c *gin.Context) {
 // @Router /api/orders [post]
 func CreateOrder(c *gin.Context) {
 	var order models.Order
+	var table models.Table
 	if err := c.BindJSON(&order); err != nil {
 		logger.Error.Printf("[controllers.CreateOrder] error creating order %v\n", err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 
+		return
+	}
+
+	if err := db.GetDBConn().First(&table, order.TableID).Error; err != nil {
+		logger.Error.Printf("[controllers.CreateOrder] error finding table %v\n", err)
+		c.JSON(http.StatusNotFound, gin.H{"error": "Table not found"})
+		return
+	}
+
+	if err := db.GetDBConn().First(&table, order.TableID).Error; err != nil || table.Reserved {
+		c.JSON(http.StatusConflict, gin.H{"error": "Table is already reserved"})
 		return
 	}
 
@@ -119,6 +145,15 @@ func CreateOrder(c *gin.Context) {
 			"error": err.Error(),
 		})
 
+		return
+	}
+
+	order.TableID = table.ID
+
+	table.Reserved = true
+	if err := db.GetDBConn().Model(&table).Updates(map[string]interface{}{"reserved": true}).Error; err != nil {
+		logger.Error.Printf("[controllers.CreateOrder] error updating table reservation status %v\n", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to reserve table"})
 		return
 	}
 
@@ -221,75 +256,98 @@ func DeleteOrderByID(c *gin.Context) {
 	})
 }
 
-// CreateCheck
-// @Summary Create Check
-// @Security ApiKeyAuth
-// @Tags checks
-// @Description create new check
-// @ID create-check
-// @Accept json
-// @Produce json
-// @Param input body models.Check true "new check info"
-// @Success 200 {object} defaultResponse
-// @Failure 400 404 {object} ErrorResponse
-// @Failure 500 {object} ErrorResponse
-// @Failure default {object} ErrorResponse
-// @Router /api/checks [post]
-func CreateCheck(c *gin.Context) {
-	var items []models.CheckItem
-	if err := c.BindJSON(&items); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+func PrintReceipt(c *gin.Context) {
+	orderID, err := strconv.Atoi(c.Param("order_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid order ID"})
 		return
 	}
 
-	orderID, _ := strconv.Atoi(c.Param("order_id"))
-	tableNumber, _ := strconv.Atoi(c.Param("table_number"))
-
-	// Вызываем сервис для создания чека
-	check, err := service.CreateCheck(orderID, tableNumber, items)
+	receipt, err := service.GenerateReceipt(orderID, 0.1)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Возвращаем результат
-	c.JSON(http.StatusOK, gin.H{"check": check})
-}
-
-func GetAllChecks(c *gin.Context) {
-	checks, err := service.GetAllChecks()
-	if err != nil {
-		logger.Error.Printf("[controllers.GetAllChecks] error getting all checks: %v\n", err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+	var order models.Order
+	if err := db.GetDBConn().First(&order, orderID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"checks": checks,
-	})
-}
+	tableID := order.TableID
 
-func GetCheckByID(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		logger.Error.Printf("[controllers.GetCheckByID] error getting check %v\n", err)
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid id",
-		})
-
+	var table models.Table
+	if err := db.GetDBConn().First(&table, tableID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Table not found"})
 		return
 	}
 
-	check, err := service.GetCheckByID(id)
-	if err != nil {
-		logger.Error.Printf("[controllers.GetCheckByID] error getting check %v\n", err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+	table.Reserved = false
+	if err := db.GetDBConn().Model(&table).Where("id = ?", table.ID).Update("reserved", false).Error; err != nil {
+		logger.Error.Printf("[controllers.PrintReceipt] error updating table reservation status %v\n", err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to unreserve table"})
 		return
 	}
 
-	c.JSON(http.StatusOK, check)
+	c.String(http.StatusOK, receipt)
 }
+
+// func CreateCheck(c *gin.Context) {
+// 	var items []models.CheckItem
+// 	if err := c.BindJSON(&items); err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+// 		return
+// 	}
+
+// 	orderID, _ := strconv.Atoi(c.Param("order_id"))
+// 	tableNumber, _ := strconv.Atoi(c.Param("table_number"))
+
+// 	// Вызываем сервис для создания чека
+// 	check, err := service.CreateCheck(orderID, tableNumber, items)
+// 	if err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+// 		return
+// 	}
+
+// 	// Возвращаем результат
+// 	c.JSON(http.StatusOK, gin.H{"check": check})
+// }
+
+// func GetAllChecks(c *gin.Context) {
+// 	checks, err := service.GetAllChecks()
+// 	if err != nil {
+// 		logger.Error.Printf("[controllers.GetAllChecks] error getting all checks: %v\n", err)
+// 		c.JSON(http.StatusInternalServerError, gin.H{
+// 			"error": err.Error(),
+// 		})
+// 		return
+// 	}
+
+// 	c.JSON(http.StatusOK, gin.H{
+// 		"checks": checks,
+// 	})
+// }
+
+// func GetCheckByID(c *gin.Context) {
+// 	id, err := strconv.Atoi(c.Param("id"))
+// 	if err != nil {
+// 		logger.Error.Printf("[controllers.GetCheckByID] error getting check %v\n", err)
+// 		c.JSON(http.StatusBadRequest, gin.H{
+// 			"error": "invalid id",
+// 		})
+
+// 		return
+// 	}
+
+// 	check, err := service.GetCheckByID(id)
+// 	if err != nil {
+// 		logger.Error.Printf("[controllers.GetCheckByID] error getting check %v\n", err)
+// 		c.JSON(http.StatusInternalServerError, gin.H{
+// 			"error": err.Error(),
+// 		})
+// 		return
+// 	}
+
+// 	c.JSON(http.StatusOK, check)
+// }

@@ -46,3 +46,13 @@ func DeleteTableByID(table *models.Table) error {
 	}
 	return nil
 }
+
+func GetTableByIDForReceipt(tableID int) (models.Table, error) {
+	var table models.Table
+	err := db.GetDBConn().First(&table, tableID).Error
+	if err != nil {
+		logger.Error.Println("[repository.GetTableByID] error getting table by id. Error is:", err.Error())
+		return table, translateError(err)
+	}
+	return table, nil
+}

@@ -6,6 +6,8 @@ import (
 	"r_keeper/errs"
 	"r_keeper/models"
 	"r_keeper/pkg/repository"
+	"strings"
+	"time"
 )
 
 func GetAllOrders() (orders []models.Order, err error) {
@@ -42,8 +44,6 @@ func CreateOrder(order models.Order) error {
 		return err
 	}
 
-	order.Table.Reserved = true
-
 	if err = repository.CreateOrder(order); err != nil {
 		return err
 	}
@@ -56,7 +56,7 @@ func EditOrderByID(id int, orderInput models.Order) (*models.Order, error) {
 		return nil, fmt.Errorf("order not found: %v", err)
 	}
 
-	orderInput.ID = uint(id)
+	orderInput.ID = id
 
 	updatedOrder, err := repository.EditOrderByID(&orderInput)
 	if err != nil {
@@ -96,4 +96,46 @@ func CreateCheck(orderID int, tableNumber int, items []models.CheckItem) (check 
 	}
 
 	return check, nil
+}
+
+// Функция генерации чека
+func GenerateReceipt(orderID int, commissionRate float64) (string, error) {
+	// Получение заказа из репозитория
+	order, err := repository.GetOrderByIDForReceipt(orderID)
+	if err != nil {
+		return "", fmt.Errorf("failed to fetch order: %w", err)
+	}
+
+	// Получение информации о столе
+	table, err := repository.GetTableByIDForReceipt(order.TableID)
+	if err != nil {
+		return "", fmt.Errorf("failed to fetch table: %w", err)
+	}
+
+	// Генерация чека
+	var receiptBuilder strings.Builder
+	receiptBuilder.WriteString(fmt.Sprintf("========== Чек ==========\n"))
+	receiptBuilder.WriteString(fmt.Sprintf("Номер заказа: %d\n", order.ID))
+	receiptBuilder.WriteString(fmt.Sprintf("Стол: %d\n", table.TableNumber))
+	receiptBuilder.WriteString(fmt.Sprintf("Дата: %s\n", time.Now().Format("02-01-2006 15:04")))
+	receiptBuilder.WriteString("=========================\n")
+
+	receiptBuilder.WriteString(fmt.Sprintf("Наименование     Кол-во     Цена     Сумма\n"))
+	receiptBuilder.WriteString(fmt.Sprintf("-------------------------------------------\n"))
+	var total float64
+	for _, item := range order.Items {
+		itemTotal := float64(item.Quantity) * item.Price
+		total += itemTotal
+		receiptBuilder.WriteString(fmt.Sprintf("%-16s %-10d %-8.2f %-8.2f\n", item.MenuItem.Name, item.Quantity, item.Price, itemTotal))
+	}
+
+	commission := total * commissionRate
+	netTotal := total + commission
+
+	receiptBuilder.WriteString(fmt.Sprintf("-------------------------------------------\n"))
+	receiptBuilder.WriteString(fmt.Sprintf("Комиссия (%.0f%%): %25.2f\n", commissionRate*100, commission))
+	receiptBuilder.WriteString(fmt.Sprintf("Итог :             %23.2f\n", netTotal))
+	receiptBuilder.WriteString("=========================\n")
+
+	return receiptBuilder.String(), nil
 }

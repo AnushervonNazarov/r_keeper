@@ -83,3 +83,13 @@ func GetCheckByID(id int) (check models.Check, err error) {
 	// Пример заглушки
 	return check, nil
 }
+
+func GetOrderByIDForReceipt(orderID int) (models.Order, error) {
+	var order models.Order
+	err := db.GetDBConn().Preload("Items.MenuItem").First(&order, orderID).Error
+	if err != nil {
+		logger.Error.Println("[repository.GetOrderByID] error getting order by id. Error is:", err.Error())
+		return order, translateError(err)
+	}
+	return order, nil
+}

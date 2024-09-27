@@ -49,4 +49,4 @@ INSERT INTO tables (id, name) VALUES (1, 'Table 1');
 
 SELECT * FROM tables
 
-SELECT * FROM tables WHERE id = 1;
+SELECT * FROM tables WHERE id = 1; 

@@ -15,35 +15,76 @@ definitions:
       message:
         type: string
     type: object
-  models.Check:
+  models.Menu:
     properties:
-      datetime:
+      category:
         type: string
-      id:
-        type: integer
-      items:
-        items:
-          $ref: '#/definitions/models.CheckItem'
-        type: array
-      order_id:
-        type: integer
-      table_number:
-        type: integer
-      tax:
-        type: number
-      total_amount:
-        type: number
-    type: object
-  models.CheckItem:
-    properties:
-      check_id:
-        type: integer
       created_at:
         type: string
       id:
         type: integer
+      items:
+        description: Связь один ко многим с OrderItem
+        items:
+          $ref: '#/definitions/models.OrderItem'
+        type: array
       name:
         type: string
+      price:
+        type: number
+      updated_at:
+        type: string
+    type: object
+  models.Order:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      items:
+        description: Связь один ко многим с OrderItem
+        items:
+          $ref: '#/definitions/models.OrderItem'
+        type: array
+      table:
+        allOf:
+        - $ref: '#/definitions/models.Table'
+        description: Связь с Table
+      table_id:
+        description: Внешний ключ на таблицу Table
+        type: integer
+      total_amount:
+        type: number
+      updated_at:
+        type: string
+      user:
+        allOf:
+        - $ref: '#/definitions/models.User'
+        description: Связь с User
+      user_id:
+        description: Внешний ключ на таблицу User
+        type: integer
+    type: object
+  models.OrderItem:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      menu_item:
+        allOf:
+        - $ref: '#/definitions/models.Menu'
+        description: Связь с Menu
+      menu_item_id:
+        description: Внешний ключ на таблицу Menu
+        type: integer
+      order:
+        allOf:
+        - $ref: '#/definitions/models.Order'
+        description: Связь с Order
+      order_id:
+        description: Внешний ключ на таблицу Order
+        type: integer
       price:
         type: number
       quantity:
@@ -71,14 +112,19 @@ definitions:
     type: object
   models.SwagOrder:
     properties:
-      price:
-        type: number
-      qunatity:
+      items:
+        description: Связь один ко многим с OrderItem
+        items:
+          $ref: '#/definitions/models.OrderItem'
+        type: array
+      table_id:
+        description: Внешний ключ на таблицу Table
         type: integer
-      table:
-        $ref: '#/definitions/models.SwagTable'
-      user:
-        $ref: '#/definitions/models.SwagUser'
+      total_amount:
+        type: number
+      user_id:
+        description: Внешний ключ на таблицу User
+        type: integer
     type: object
   models.SwagTable:
     properties:
@@ -98,6 +144,46 @@ definitions:
       username:
         type: string
     type: object
+  models.Table:
+    properties:
+      capacity:
+        type: integer
+      created_at:
+        type: string
+      id:
+        type: integer
+      orders:
+        description: Связь один ко многим с Order
+        items:
+          $ref: '#/definitions/models.Order'
+        type: array
+      reserved:
+        type: boolean
+      table_number:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  models.User:
+    properties:
+      created_at:
+        description: Автоматическая метка времени
+        type: string
+      id:
+        type: integer
+      is_deleted:
+        description: Флаг удаления
+        type: boolean
+      password:
+        type: string
+      role:
+        type: string
+      updated_at:
+        description: Автоматическая метка времени
+        type: string
+      username:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -105,43 +191,6 @@ info:
   title: R_KEEPER API
   version: "1.0"
 paths:
-  /api/checks:
-    post:
-      consumes:
-      - application/json
-      description: create new check
-      operationId: create-check
-      parameters:
-      - description: new check info
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/models.Check'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.defaultResponse'
-        "400":
-          description: Bad Request
-          schema:
-            type: "404"
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        default:
-          description: ""
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: Create Check
-      tags:
-      - checks
   /api/menus:
     get:
       description: get list of menus

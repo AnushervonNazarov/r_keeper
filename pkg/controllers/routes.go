@@ -36,8 +36,8 @@ func RunRouts() *gin.Engine {
 
 	checkG := apiG.Group("/checks")
 	{
-		checkG.GET("/:id", GetCheckByID)
-		checkG.POST("/:order_id/:table_number", CreateCheck)
+		checkG.GET("/:order_id/receipt", PrintReceipt)
+
 	}
 
 	orderG := apiG.Group("/orders")

@@ -40,7 +40,7 @@ func EditTableByID(id int, tableInput models.Table) (*models.Table, error) {
 		return nil, fmt.Errorf("table not found: %v", err)
 	}
 
-	tableInput.ID = uint(id)
+	tableInput.ID = id
 
 	updatedtable, err := repository.EditTableByID(&tableInput)
 	if err != nil {

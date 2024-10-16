@@ -21,8 +21,8 @@
       "server_name": "r_keeper_service"
     },
     "postgres_params": {
-      "host": "localhost",
-      "port": "5433",
+      "host": "database",
+      "port": "5432",
       "user": "postgres",
       "database": "postgres"
     }

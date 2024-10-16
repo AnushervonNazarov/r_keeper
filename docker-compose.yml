@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  database:
+    image: postgres:latest
+    container_name: database
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=q123
+      - POSTGRES_DB=postgres
+    restart: always
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 3s
+      retries: 3
+
+  rkeeper:
+    container_name: rkeeper
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports: 
+      - "8080:8080"
+    volumes:
+      - rkeeper:/usr/src/rkeeper/
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - backend
+
+volumes:
+  rkeeper:
+  postgres:
+
+networks:
+  backend:
+    driver: bridge

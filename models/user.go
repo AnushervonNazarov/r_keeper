@@ -9,9 +9,9 @@ type User struct {
 	Username  string    `json:"username" gorm:"unique"`
 	Password  string    `json:"password" gorm:"not null"`
 	Role      string    `json:"role" gorm:"not null"`
-	IsDeleted bool      `json:"is_deleted" gorm:"default:false"`  // Флаг удаления
-	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"` // Автоматическая метка времени
-	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"` // Автоматическая метка времени
+	IsDeleted bool      `json:"is_deleted" gorm:"default:false"`
+	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 }
 
 type SwagUser struct {

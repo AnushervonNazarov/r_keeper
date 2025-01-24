@@ -13,7 +13,7 @@ import (
 
 func GetAllOrders() ([]models.OrderResponse, error) {
 	var orders []models.Order
-	err := repository.GetAllOrders(&orders) // Вызов репозитория для получения заказов
+	err := repository.GetAllOrders(&orders)
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +109,6 @@ func DeleteOrderByID(id int) error {
 	return nil
 }
 
-// Создание чека
 func CreateCheck(orderID int, tableNumber int, items []models.CheckItem) (check models.Check, err error) {
 	check = models.Check{
 		OrderID:     orderID,
@@ -119,7 +118,6 @@ func CreateCheck(orderID int, tableNumber int, items []models.CheckItem) (check 
 
 	check.CalculateTotal()
 
-	// Сохраняем чек через репозиторий
 	err = repository.SaveCheck(check)
 	if err != nil {
 		return check, errors.New("failed to save check")
@@ -128,29 +126,25 @@ func CreateCheck(orderID int, tableNumber int, items []models.CheckItem) (check 
 	return check, nil
 }
 
-// Функция генерации чека
 func GenerateReceipt(orderID int, commissionRate float64) (string, error) {
-	// Получение заказа из репозитория
 	order, err := repository.GetOrderByIDForReceipt(orderID)
 	if err != nil {
 		return "", fmt.Errorf("failed to fetch order: %w", err)
 	}
 
-	// Получение информации о столе
 	table, err := repository.GetTableByIDForReceipt(order.TableID)
 	if err != nil {
 		return "", fmt.Errorf("failed to fetch table: %w", err)
 	}
 
-	// Генерация чека
 	var receiptBuilder strings.Builder
-	receiptBuilder.WriteString("========== Чек ==========\n")
-	receiptBuilder.WriteString("Номер заказа: " + strconv.Itoa(order.ID) + "\n")
-	receiptBuilder.WriteString("Стол: " + strconv.Itoa(table.TableNumber) + "\n")
-	receiptBuilder.WriteString("Дата: " + time.Now().Format("02-01-2006 15:04") + "\n")
+	receiptBuilder.WriteString("========== Receipt ==========\n")
+	receiptBuilder.WriteString("Order number: " + strconv.Itoa(order.ID) + "\n")
+	receiptBuilder.WriteString("Table: " + strconv.Itoa(table.TableNumber) + "\n")
+	receiptBuilder.WriteString("Data: " + time.Now().Format("02-01-2006 15:04") + "\n")
 	receiptBuilder.WriteString("=========================\n")
 
-	receiptBuilder.WriteString("Наименование     Кол-во     Цена     Сумма\n")
+	receiptBuilder.WriteString("Name     Quantity     Price     Sum\n")
 	receiptBuilder.WriteString("-------------------------------------------\n")
 	var total float64
 	for _, item := range order.Items {
@@ -163,8 +157,8 @@ func GenerateReceipt(orderID int, commissionRate float64) (string, error) {
 	netTotal := total + commission
 
 	receiptBuilder.WriteString("-------------------------------------------\n")
-	receiptBuilder.WriteString(fmt.Sprintf("Комиссия (%.0f%%): %25.2f\n", commissionRate*100, commission))
-	receiptBuilder.WriteString(fmt.Sprintf("Итог :             %23.2f\n", netTotal))
+	receiptBuilder.WriteString(fmt.Sprintf("Commission (%.0f%%): %25.2f\n", commissionRate*100, commission))
+	receiptBuilder.WriteString(fmt.Sprintf("Summary :             %23.2f\n", netTotal))
 	receiptBuilder.WriteString("=========================\n")
 
 	return receiptBuilder.String(), nil

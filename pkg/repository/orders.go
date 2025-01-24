@@ -60,32 +60,24 @@ func DeleteOrderByID(order *models.Order) error {
 	return nil
 }
 
-// Сохранение чека в базе данных
 func SaveCheck(check models.Check) error {
-	// Здесь будет логика сохранения чека в базу данных
 	if err := db.GetDBConn().Save(&check).Error; err != nil {
 		logger.Error.Println("[repository.SaveCheck] error saving check. Error is:", err.Error())
 		return translateError(err)
 	}
-	// Например, SQL-запрос или сохранение в файл
 
-	// Пример обработки ошибки
 	if check.OrderID == 0 {
 		return errors.New("invalid order ID")
 	}
 
-	// Заглушка для успешного сохранения
 	return nil
 }
 
-// Получение чека по ID
 func GetCheckByID(id int) (check models.Check, err error) {
-	// Логика получения чека из базы данных
 	if err = db.GetDBConn().Where("id = ?", id).Preload("Items").First(&check).Error; err != nil {
 		logger.Error.Println("[repository.GetCheckByID] error getting check by id. Error is:", err.Error())
 		return check, translateError(err)
 	}
-	// Пример заглушки
 	return check, nil
 }
 

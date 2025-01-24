@@ -33,5 +33,5 @@ func (c *Check) CalculateTotal() {
 		total += item.Price * float64(item.Quantity)
 	}
 	c.TotalAmount = total
-	c.Tax = total * 0.1 // предположим, что налог составляет 10%
+	c.Tax = total * 0.1
 }

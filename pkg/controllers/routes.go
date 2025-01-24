@@ -68,15 +68,6 @@ func RunRouts() *gin.Engine {
 		tableG.DELETE("/:id", DeleteTableByID)
 	}
 
-	// dishG := r.Group("/dishes")
-	// {
-	// 	dishG.GET("", GetALlDishes)
-	// 	dishG.GET("/:id", GetDishByID)
-	// 	dishG.POST("", CreateDish)
-	// 	dishG.PUT("/:id", EditDishByID)
-	// 	dishG.DELETE("/:id", DeleteDishByID)
-	// }
-
 	return r
 }
 
